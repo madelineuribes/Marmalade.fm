@@ -1,4 +1,4 @@
-/* global MixCloud */
+/*global Mixcloud*/
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
@@ -11,18 +11,31 @@ const Archive = () => <h1>Archive</h1>
 const About = () => <h1>About</h1>
 
 class App extends Component {
+
   mountAudio = async () => {
-    const widget = MixCloud.PlayerWidget(this.player);
-    await widget.ready
-    await widget.play()
-    console.log(widget);
+    this.widget = Mixcloud.PlayerWidget(this.player);
+
+    await this.widget.ready;
+    await this.widget.play();
+
+    console.log(this.widget);
   };
 
   componentDidMount() {
     // when app component is loaded to page, our component gets called 
     // so we can run mountAudio
     this.mountAudio()
-  }
+  };
+
+  togglePlay = () => {
+    console.log('togglePlay');
+    this.widget.togglePlay();
+  };
+
+  playMix = mixName => {
+    // load mix by name and play it immediately 
+    this.widget.load(mixName, true);
+  };
 
   render() {
     return (
@@ -34,7 +47,17 @@ class App extends Component {
             <div className='w-50-l relative z-1'>
               {/* Header */}
               <Header />
-              {/* Routed Page */}
+
+              <div>
+                <button onClick={this.togglePlay}>Pause</button>
+              </div>
+
+              <div>
+                <button onClick={() => this.playMix('/NTSRadio/kit-grill-16th-august-2020/')}>
+                  Play Mix
+                </button>
+              </div>
+
               <Route exact path="/" component={Home} />
               <Route path="/archive" component={Archive} />
               <Route path="/about" component={About} />
@@ -46,8 +69,9 @@ class App extends Component {
             height="60"
             src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FNTSRadio%2Fopen-hand-real-flames-22nd-january-2020%2F" frameBorder="0"
             className="db fixed bottom-0 z-5"
-            ref={player => (this.player = player)}>
-          </iframe>
+            ref={player => (this.player = player)}
+            allow='autoplay'
+          />
         </div>
       </Router>
     );
